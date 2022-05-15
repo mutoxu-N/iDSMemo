@@ -1,0 +1,13 @@
+body{
+    background-color: lightgray;
+}
+
+h1 {
+    color: #B00020;
+}
+
+div.container {
+    width: 90%;
+    height: 100em;
+    background-color: white;
+}
