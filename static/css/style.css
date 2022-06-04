@@ -20,7 +20,7 @@ div#container {
     overflow: hidden;
 }
 
-div.memo {
+div#memo {
     color: black;
 }
 

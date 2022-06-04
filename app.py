@@ -1,5 +1,4 @@
 from __future__ import print_function
-from crypt import methods
 from flask import Flask, render_template, request
 import memo_data
 
@@ -9,19 +8,17 @@ data = memo_data.MemoData()
 # root アドレスのアクセス処理
 @app.route("/")
 def hello():
-    return render_template("index.html")
-
-def memo_clicked():
-    print('pong')
+    return render_template("index.html", memos=data.memos)
 
 
-# TODO JavaScriptからPython関数を実行する
-@app.route("/test/", methods=['GET'])
+# メモがクリックされるとここが実行される
+@app.route("/add", methods=["GET"])
 def test():
-    print(request.args.get('a'))
+    print(request.headers)
+    data.add("a")
+    return ""
 
 
 if __name__ == "__main__":
-    print('on hello')
     # flask 実行
-    app.run(host="127.0.0.1", port=8080)
+    app.run(host="127.0.0.1", port=8080, debug=True)

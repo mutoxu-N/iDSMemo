@@ -9,6 +9,13 @@
 </head>
 <body>
 <div id="container">
+    {% for memo in memos %}
+        <div id="memo">
+            <ul>
+                <li>{{ memo }}</li>
+            </ul>
+        </div>
+    {% endfor %}
 </div>
 <script type="text/javascript" src="/static/js/script.js"></script> 
 </body>

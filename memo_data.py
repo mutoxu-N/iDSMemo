@@ -9,3 +9,8 @@ class MemoData():
 
     def save(self) -> None:
         joblib.dump(self.memos, "memo", compress=3)
+
+    def add(self, txt) -> None:
+        self.memos.append(txt)
+        self.save()
+        
