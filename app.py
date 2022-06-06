@@ -12,10 +12,19 @@ def hello():
 
 
 # メモがクリックされるとここが実行される
-@app.route("/add", methods=["GET"])
-def test():
-    print(request.headers)
-    data.add("a")
+@app.route("/receive", methods=["POST"])
+def memo_clicked():
+    if request.headers['Content-Type'] != 'application/json':
+            print(request.headers['Content-Type'])
+            return "ERROR"
+            
+    TYPE = {"new": 1, "edit": 2}
+    js = request.json
+    if js["type"] == TYPE["new"]:
+        print("new")
+    elif js["type"] == TYPE["edit"]:
+        print("edit")
+    print(request.json)
     return ""
 
 

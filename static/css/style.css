@@ -24,6 +24,10 @@ div#memo {
     color: black;
 }
 
+div.last {
+    background-color: lightgray;
+}
+
 div.active{
     background-color: yellow;
 }
