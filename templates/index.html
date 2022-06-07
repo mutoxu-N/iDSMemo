@@ -10,13 +10,13 @@
 <body>
 <div id="container">
     {% for memo in memos %}
-        <div id="memo">
-            <ul>
-                <li>{{ memo }}</li>
-            </ul>
+        <div class="memo">
+            <ul style="margin-bottom: 0px;">
+                <li><div class="content">{{ memo }}</div><button class="rm">削除</button></li>
+            </ul>    
         </div>
     {% endfor %}
-    <div class="last">
+    <div id="last">
         <ul>
             <li style="list-style:none;">　</li>
         </ul>

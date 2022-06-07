@@ -1,4 +1,5 @@
 from __future__ import print_function
+from os import remove
 from flask import Flask, render_template, request
 import memo_data
 
@@ -18,13 +19,15 @@ def memo_clicked():
             print(request.headers['Content-Type'])
             return "ERROR"
             
-    TYPE = {"new": 1, "edit": 2}
+    TYPE = {"new": 1, "edit": 2, "remove": 3}
     js = request.json
     if js["type"] == TYPE["new"]:
-        print("new")
+        data.add("a")
     elif js["type"] == TYPE["edit"]:
         print("edit")
-    print(request.json)
+    elif js["type"] == TYPE["remove"]:
+        data.remove(js["id"])
+    print(js)
     return ""
 
 

@@ -1,5 +1,5 @@
 const addr = "http://127.0.0.1:8080/";
-const TYPE = {new: 1, edit:2}
+const TYPE = {new: 1, edit:2, remove:3}
 
 function send(data) {
 
@@ -21,11 +21,21 @@ function send(data) {
     return ""
 }
 
-$("div#memo").on("click", (e) => {
-    var index = $(e.currentTarget).index(); //クリックされた要素のインデックス
-    send({type: TYPE["edit"], id: index, text: "b"});
+function get_memo_idx(element) {
+    return $(element).index();
+}
+
+
+$("div.content").on("click", (e) => {
+    send({type: TYPE["edit"], id: get_memo_idx(e.currentTarget), text: "b"});
 })
 
-$("div.last").on("click", (e) => {
+$("div#last").on("click", (e) => {
     send({type: TYPE["new"]});
 })
+
+$("button.rm").on("click", (e) => {
+    send({type: TYPE["remove"], id: get_memo_idx($(e.currentTarget).parent().parent().parent())})
+})
+
+

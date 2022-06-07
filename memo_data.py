@@ -14,3 +14,6 @@ class MemoData():
         self.memos.append(txt)
         self.save()
         
+    def remove(self, idx: int) -> None:
+        self.memos[idx:idx+1] = []
+        self.save()

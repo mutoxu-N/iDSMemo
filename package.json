@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@editorjs/editorjs": "^2.24.3",
     "electron": "^18.2.0"
   },
   "dependencies": {

@@ -7,6 +7,7 @@ h1 {
     color: #B00020;
 }
 
+
 div#container {
     width: 80%;
     height: auto;
@@ -20,14 +21,32 @@ div#container {
     overflow: hidden;
 }
 
-div#memo {
+div.memo {
+    overflow: hidden;
     color: black;
+    padding: 5px;
+    margin: 3px;
 }
 
-div.last {
+div.memo:hover {
+    background-color: yellow;
+}
+
+div#last {
     background-color: lightgray;
 }
 
-div.active{
-    background-color: yellow;
+div.content{
+    flex: 1;
+    float: left;
+    width: calc(100% - 60px);
+}
+
+
+button.rm {
+    float: left;
+    max-height: 100%;
+    height: auto;
+    width: 60px;
+    margin-top: auto;
 }
