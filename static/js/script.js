@@ -13,12 +13,12 @@ function send(data) {
     }).done(function(data, textStatus, jqXHR ){
         console.log("done");
         console.log(data);
+        window.location.href = "/";
 
     }).fail(function(jqXHR, textStatus, errorThrown){
         console.log("failed");
 
     });
-    return ""
 }
 
 function get_memo_idx(element) {
@@ -31,11 +31,12 @@ $("div.content").on("click", (e) => {
 })
 
 $("div#last").on("click", (e) => {
-    send({type: TYPE["new"]});
+    send({type: TYPE["new"], text: "b"});
 })
 
 $("button.rm").on("click", (e) => {
     send({type: TYPE["remove"], id: get_memo_idx($(e.currentTarget).parent().parent().parent())})
 })
+
 
 

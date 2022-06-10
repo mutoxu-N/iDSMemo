@@ -1,6 +1,6 @@
 from __future__ import print_function
 from os import remove
-from flask import Flask, render_template, request
+from flask import Flask, Response, jsonify, render_template, request
 import memo_data
 
 app = Flask(__name__)
@@ -22,13 +22,16 @@ def memo_clicked():
     TYPE = {"new": 1, "edit": 2, "remove": 3}
     js = request.json
     if js["type"] == TYPE["new"]:
-        data.add("a")
+        data.add(js["text"])
+
     elif js["type"] == TYPE["edit"]:
         print("edit")
+
     elif js["type"] == TYPE["remove"]:
         data.remove(js["id"])
+        
     print(js)
-    return ""
+    return jsonify(res="ok")
 
 
 if __name__ == "__main__":

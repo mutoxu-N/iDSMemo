@@ -19,14 +19,14 @@ app.on('ready', function() {
   });
 
   const rp = require('request-promise');
-  const addr = 'http://localhost:8080'; // アドレス
+  const addr = 'http://127.0.0.1:8080'; // アドレス
 
   const openWindow = function() {
     mainWindow = new BrowserWindow({width: 1280, height: 720 });
     mainWindow.loadURL(addr);
 
     // 開発ツール
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     // 終了したとき
     mainWindow.on('closed', function() {

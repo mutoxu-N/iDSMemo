@@ -34,6 +34,9 @@ div.memo:hover {
 
 div#last {
     background-color: lightgray;
+    padding: 5px;
+    text-align: center;
+    border-style: dotted;
 }
 
 div.content{
