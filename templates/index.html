@@ -12,15 +12,11 @@
     {% for memo in memos %}
         <div class="memo">
             <ul style="margin-bottom: 0px;">
-                <li><div class="content">{{ memo }}</div><button class="rm">削除</button></li>
+                <li><div class="content" contenteditable="true">{{ memo }}</div><button class="rm">削除</button></li>
             </ul>    
         </div>
     {% endfor %}
-    <div id="last">
-        <ul>
-            <li style="list-style:none;"></li>
-        </ul>
-    </div>
+    <div id="last" contenteditable="true"><br></div>
 </div>
 <script type="text/javascript" src="/static/js/script.js"></script> 
 </body>

@@ -3,17 +3,24 @@ import joblib, os
 class MemoData():
     def __init__(self) -> None:
         if os.path.exists('memo'):
-            self.memos = joblib.load("memo")
+            self.__memos = joblib.load("memo")
         else:
-            self.memos = []
+            self.__memos = []
+
+    @property
+    def memo(self):
+        return tuple(self.__memos)
 
     def save(self) -> None:
-        joblib.dump(self.memos, "memo", compress=3)
+        joblib.dump(self.__memos, "memo", compress=3)
 
     def add(self, txt) -> None:
-        self.memos.append(txt)
+        self.__memos.append(txt)
         self.save()
         
     def remove(self, idx: int) -> None:
-        self.memos[idx:idx+1] = []
+        self.__memos[idx:idx+1] = []
         self.save()
+
+    def set(self, id: int, text: str) -> None:
+        self.__memos[id] = text

@@ -32,10 +32,14 @@ div.memo:hover {
     background-color: yellow;
 }
 
+div.content {
+    outline: 0px solid transparent;
+}
+
 div#last {
-    background-color: lightgray;
+    background-color: white;
     padding: 5px;
-    text-align: center;
+    text-align: left;
     border-style: dotted;
 }
 
