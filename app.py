@@ -28,11 +28,15 @@ def memo_clicked():
     httpRes = 200 # OK used as check
     
     if js["type"] == Type.NEW:
-        data.add(js["text"])
+        if js["text"] != "":
+            data.add(js["text"])
         httpRes = 201 # Created
 
     elif js["type"] == Type.EDIT:
-        data.set(js["id"], js["text"])
+        if js["text"] == "":
+            data.remove(js["id"])
+        else: 
+            data.set(js["id"], js["text"])
         httpRes = 202 # Accepted used as edit
 
     elif js["type"] == Type.REMOVE:
