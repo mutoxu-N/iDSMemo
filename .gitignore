@@ -4,3 +4,5 @@ node_modules
 env1
 settings.json
 form.drawio
+__pycache__/memo_data.cpython-39.pyc
+memo

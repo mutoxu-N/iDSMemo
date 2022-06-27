@@ -25,17 +25,22 @@ def memo_clicked():
             return "ERROR"
             
     js = request.json
+    httpRes = 200 # OK used as check
     
     if js["type"] == Type.NEW:
         data.add(js["text"])
+        httpRes = 201 # Created
 
     elif js["type"] == Type.EDIT:
         data.set(js["id"], js["text"])
+        httpRes = 202 # Accepted used as edit
 
     elif js["type"] == Type.REMOVE:
         data.remove(js["id"])
+        httpRes = 203 # Non-Authoritative Information used as remove
+
     # print(js)
-    return jsonify(res="ok")
+    return jsonify(data.memo), httpRes
 
 
 if __name__ == "__main__":
