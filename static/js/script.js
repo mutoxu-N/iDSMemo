@@ -1,7 +1,7 @@
 const addr = "http://127.0.0.1:8080/";
-const Type = {new: 1, edit:2, remove:3, check: 4}
-
-currentFocus = null;
+const Type = {new: 1, edit:2, remove:3, check: 4};
+const KeyNum = {enter: 13, up: 38, down: 40, left: 37, right: 39};
+cursorPos = null
 memoData = {}
 
 function send(data) {
@@ -22,6 +22,22 @@ function send(data) {
     });
 }
 
+function set_focus(element, pos=0) {
+    console.log(pos);
+    setTimeout(() => element.focus(), 0);
+
+    document.getSelection().removeAllRanges();
+}
+function get_memo_idx(element) { return $(element).index(); }
+function add() {
+    send({type: Type["new"], text: $(':focus').text()});        
+    $("div#last").empty();
+}
+function edit() {
+    send({type: Type["edit"], id: get_memo_idx($(':focus').parent().parent().parent()), text: $(':focus').text()});
+}
+
+
 function reload(data) {
     // remove all children
     $("#container > div.memo ").remove()
@@ -40,10 +56,29 @@ function reload(data) {
     // element settings
     $("div.content").keydown((e) => {
         // edit
-        currentFocus = ($(e.currentTarget))
-        if (e.keyCode === 13) {
-            edit();
-            return false;
+        switch(e.keyCode) {
+            case KeyNum["enter"]:
+                edit();
+                return false;
+
+            case KeyNum["down"]:
+                currentId = get_memo_idx($(':focus').parent().parent().parent());
+                if(currentId+1 === memoData.length){
+                    set_focus($('div#last'));
+                } else {
+                    len = memoData[currentId+1].length;
+                    set_focus($('#container > div.memo:nth-child(' + (currentId+2) + ') > ul > li > div.content'), len);
+                }
+                break;
+
+            case KeyNum["up"]:
+                currentId = get_memo_idx($(':focus').parent().parent().parent());
+                if (currentId > 0) {
+                    len = memoData[currentId-1].length;
+                    set_focus($('#container > div.memo:nth-child(' + (currentId) + ') > ul > li > div.content'), len);
+                }
+                break;
+
         }
     })
     $("button.rm").on("click", (e) => {
@@ -54,45 +89,30 @@ function reload(data) {
     // focus
     switch(data.type){
         case Type["new"]:
-            setTimeout(() => $('div#last').focus(), 0);
-            console.log($('div#last'));
+            set_focus($('div#last'));
             break;
         case Type["edit"]:
-            setTimeout(() => $('#container > div.memo:nth-child(' + (data.id+2) + ') > ul > li > div.content').focus(), 0);
-            console.log($('#container > div.memo:nth-child(' + (data.id+2) + ') > ul > li > div.content'));
+            set_focus($('#container > div.memo:nth-child(' + (data.id+2) + ') > ul > li > div.content'));
             break;
     }
 
 }
 
 
-function add() {
-    send({type: Type["new"], text: currentFocus.text()});        
-    $("div#last").empty();
-}
 
-function edit() {
-    send({type: Type["edit"], id: get_memo_idx(currentFocus.parent().parent().parent()), text: currentFocus.text()});
-
-}
-
-function get_memo_idx(element) {
-    return $(element).index();
-}
-
-
-
-
-//TODO EDITフォーカスが外れたら変更内容をFlaskに送る
 // element settings
 $("div#last").keydown((e) => {
     // add
-    currentFocus = ($(e.currentTarget))
-    if (e.keyCode === 13) {
+    if (e.keyCode === KeyNum["enter"]) {
         add();
         return false;
+    } else if(e.keyCode === KeyNum["up"]) {
+        set_focus($('#container > div.memo:nth-child(' + (memoData.length) + ') > ul > li > div.content'));
     }
 });
 
 // get data from flask and display
 send({type: Type["check"]});
+
+//TODO EDITフォーカスが外れたら変更内容をFlaskに送る
+//TODO カーソルの位置を保存して、メモを移動したときにカーソルの位置を設定する。
