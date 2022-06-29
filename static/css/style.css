@@ -29,7 +29,7 @@ div.memo {
 }
 
 div.memo:hover {
-    background-color: yellow;
+    background-color: lightblue;
 }
 
 div#last {
@@ -42,6 +42,7 @@ div.memo:focus-within, #last:focus{
     border-style: solid;
     border-width: 2px;
     border-color: lightcoral;
+    background-color: lightcyan;
 }
 
 div.content{

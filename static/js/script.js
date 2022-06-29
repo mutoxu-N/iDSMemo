@@ -1,6 +1,6 @@
 const addr = "http://127.0.0.1:8080/";
 const Type = {new: 1, edit:2, remove:3, check: 4};
-const KeyNum = {enter: 13, end: 35, home: 36, up: 38, down: 40, left: 37, right: 39};
+const KeyNum = {enter: 13, end: 35, home: 36, up: 38, down: 40, left: 37, right: 39, backspace: 8};
 cursorPos = null
 memoData = {}
 
@@ -24,7 +24,12 @@ function send(data) {
 
 function get_memo_idx(element) { return $(element).index(); }
 function add() { send({type: Type["new"], text: $(':focus').text()}); $("div#last").empty(); }
-function edit() { send({type: Type["edit"], id: get_memo_idx($(':focus').parent().parent().parent()), text: $(':focus').text()}); }
+function edit(down=true) { 
+    id = get_memo_idx($(':focus').parent().parent().parent());
+    if(memoData[get_memo_idx($(':focus').parent().parent().parent())] != $(':focus').text())
+        if(down) send({type: Type["edit"], id: id, text: $(':focus').text(), next: id+2});
+        else     send({type: Type["edit"], id: id, text: $(':focus').text(), next: id});
+}
 
 function set_focus(element) {
 
@@ -67,12 +72,8 @@ function reload(data) {
         // edit
         switch(e.keyCode) {
             case KeyNum["enter"]:
-                cursorPos = document.getSelection().focusOffset;
-                e.preventDefault();
-                edit();
-                break;
-
             case KeyNum["down"]:
+                edit();
                 e.preventDefault();
                 currentId = get_memo_idx($(':focus').parent().parent().parent());
                 if(currentId+1 === memoData.length) set_focus($('div#last'));
@@ -80,6 +81,7 @@ function reload(data) {
                 break;
 
             case KeyNum["up"]:
+                edit(false);
                 e.preventDefault();
                 currentId = get_memo_idx($(':focus').parent().parent().parent());
                 if (currentId > 0) set_focus($('#container > div.memo:nth-child(' + (currentId) + ') > ul > li > div.content'));
@@ -101,6 +103,12 @@ function reload(data) {
                 cursorPos = $(':focus').text().length;
                 break;
 
+            case KeyNum["backspace"]:
+                cursorPos = $(':focus').text().length-1;
+                break;
+
+            default:
+                cursorPos = document.getSelection().focusOffset + 1;
         }
     })
 
@@ -113,7 +121,7 @@ function reload(data) {
             set_focus($('div#last'));
             break;
         case Type["edit"]:
-            set_focus($('#container > div.memo:nth-child(' + (data.id+2) + ') > ul > li > div.content'));
+            set_focus($('#container > div.memo:nth-child(' + (data.next) + ') > ul > li > div.content'));
             break;
     }
 
