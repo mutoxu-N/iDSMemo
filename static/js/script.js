@@ -1,6 +1,6 @@
 const addr = "http://127.0.0.1:8080/";
 const Type = {new: 1, edit:2, remove:3, check: 4};
-const KeyNum = {enter: 13, up: 38, down: 40, left: 37, right: 39};
+const KeyNum = {enter: 13, end: 35, home: 36, up: 38, down: 40, left: 37, right: 39};
 cursorPos = null
 memoData = {}
 
@@ -22,21 +22,27 @@ function send(data) {
     });
 }
 
-function set_focus(element, pos=0) {
-    console.log(pos);
-    setTimeout(() => element.focus(), 0);
-
-    document.getSelection().removeAllRanges();
-}
 function get_memo_idx(element) { return $(element).index(); }
-function add() {
-    send({type: Type["new"], text: $(':focus').text()});        
-    $("div#last").empty();
-}
-function edit() {
-    send({type: Type["edit"], id: get_memo_idx($(':focus').parent().parent().parent()), text: $(':focus').text()});
-}
+function add() { send({type: Type["new"], text: $(':focus').text()}); $("div#last").empty(); }
+function edit() { send({type: Type["edit"], id: get_memo_idx($(':focus').parent().parent().parent()), text: $(':focus').text()}); }
 
+function set_focus(element) {
+    setTimeout(() => element.focus(), 0);
+    if(element[0].id === "last") return;
+
+    selection = document.getSelection();
+    selection.removeAllRanges(); // remove ranges
+
+    // calc cursor position
+    pos = cursorPos;
+    if(element.text().length < cursorPos) pos = element.text().length;
+
+    // set cursor position
+    r = document.createRange();
+    r.setStart(element[0].firstChild, pos);
+    r.setEnd(element[0].firstChild, pos);  
+    selection.addRange(r);
+}
 
 function reload(data) {
     // remove all children
@@ -58,33 +64,45 @@ function reload(data) {
         // edit
         switch(e.keyCode) {
             case KeyNum["enter"]:
+                cursorPos = document.getSelection().focusOffset;
+                e.preventDefault();
                 edit();
-                return false;
+                break;
 
             case KeyNum["down"]:
+                e.preventDefault();
                 currentId = get_memo_idx($(':focus').parent().parent().parent());
-                if(currentId+1 === memoData.length){
-                    set_focus($('div#last'));
-                } else {
-                    len = memoData[currentId+1].length;
-                    set_focus($('#container > div.memo:nth-child(' + (currentId+2) + ') > ul > li > div.content'), len);
-                }
+                if(currentId+1 === memoData.length) set_focus($('div#last'));
+                else set_focus($('#container > div.memo:nth-child(' + (currentId+2) + ') > ul > li > div.content'));
                 break;
 
             case KeyNum["up"]:
+                e.preventDefault();
                 currentId = get_memo_idx($(':focus').parent().parent().parent());
-                if (currentId > 0) {
-                    len = memoData[currentId-1].length;
-                    set_focus($('#container > div.memo:nth-child(' + (currentId) + ') > ul > li > div.content'), len);
-                }
+                if (currentId > 0) set_focus($('#container > div.memo:nth-child(' + (currentId) + ') > ul > li > div.content'));
+                break;
+
+            case KeyNum["right"]:
+                cursorPos = document.getSelection().focusOffset + 1;
+                break;
+
+            case KeyNum["left"]:
+                cursorPos = document.getSelection().focusOffset - 1;
+                break;
+
+            case KeyNum["home"]:
+                cursorPos = 0;
+                break;
+
+            case KeyNum["end"]:
+                cursorPos = $(':focus').text().length;
                 break;
 
         }
     })
-    $("button.rm").on("click", (e) => {
-        send({type: Type["remove"], id: get_memo_idx($(e.currentTarget).parent().parent().parent())})
-    })
-    
+
+    $("div.content").click((e) => { cursorPos = document.getSelection().focusOffset; })
+    $("button.rm").on("click", (e) => { send({type: Type["remove"], id: get_memo_idx($(e.currentTarget).parent().parent().parent())}) })
 
     // focus
     switch(data.type){
@@ -99,15 +117,38 @@ function reload(data) {
 }
 
 
-
 // element settings
 $("div#last").keydown((e) => {
     // add
-    if (e.keyCode === KeyNum["enter"]) {
-        add();
-        return false;
-    } else if(e.keyCode === KeyNum["up"]) {
-        set_focus($('#container > div.memo:nth-child(' + (memoData.length) + ') > ul > li > div.content'));
+    switch(e.keyCode){
+        case KeyNum["enter"]:
+            e.preventDefault();
+            add();
+            break;
+
+        case KeyNum["up"]:
+            e.preventDefault();
+            if(memoData.length > 0) set_focus($('#container > div.memo:nth-child(' + (memoData.length) + ') > ul > li > div.content'));
+            break;
+            
+        case KeyNum["right"]:
+            cursorPos = document.getSelection().focusOffset + 1;
+            break;
+
+        case KeyNum["left"]:
+            cursorPos = document.getSelection().focusOffset - 1;
+            break;
+        
+        case KeyNum["home"]:
+            cursorPos = 0;
+            break;
+
+        case KeyNum["end"]:
+            cursorPos = $(':focus').text().length;
+            break;
+
+        default:
+            cursorPos = document.getSelection().focusOffset;
     }
 });
 
@@ -115,4 +156,4 @@ $("div#last").keydown((e) => {
 send({type: Type["check"]});
 
 //TODO EDITフォーカスが外れたら変更内容をFlaskに送る
-//TODO カーソルの位置を保存して、メモを移動したときにカーソルの位置を設定する。
+//TODO div#last から up するとカーソルがうまくいかない
