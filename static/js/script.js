@@ -27,17 +27,20 @@ function add() { send({type: Type["new"], text: $(':focus').text()}); $("div#las
 function edit() { send({type: Type["edit"], id: get_memo_idx($(':focus').parent().parent().parent()), text: $(':focus').text()}); }
 
 function set_focus(element) {
-    setTimeout(() => element.focus(), 0);
-    if(element[0].id === "last") return;
-
-    selection = document.getSelection();
-    selection.removeAllRanges(); // remove ranges
 
     // calc cursor position
     pos = cursorPos;
     if(element.text().length < cursorPos) pos = element.text().length;
 
+    // if #last is empty
+    if(pos ===0 && element[0].id === "last") {
+        setTimeout(() => element.focus(), 0);
+        return; 
+    }
+
     // set cursor position
+    selection = document.getSelection();
+    selection.removeAllRanges(); // remove ranges
     r = document.createRange();
     r.setStart(element[0].firstChild, pos);
     r.setEnd(element[0].firstChild, pos);  
@@ -148,7 +151,7 @@ $("div#last").keydown((e) => {
             break;
 
         default:
-            cursorPos = document.getSelection().focusOffset;
+            cursorPos = document.getSelection().focusOffset + 1;
     }
 });
 
