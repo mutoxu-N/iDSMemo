@@ -1,5 +1,5 @@
 const addr = "http://127.0.0.1:8080/";
-const Type = {new: 1, edit:2, remove:3, check: 4};
+const Type = {new: 1, edit:2, remove:3, check: 4, open:5, undo:6, redo: 7};
 const KeyNum = {enter: 13, end: 35, home: 36, up: 38, down: 40, left: 37, right: 39, backspace: 8};
 cursorPos = null
 memoData = {}

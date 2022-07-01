@@ -3,18 +3,22 @@ from flask import Flask, Response, jsonify, render_template, request
 import memo_data
 
 app = Flask(__name__)
-data = memo_data.MemoData()
+data = memo_data.MemoData("memo.ids")
 
 class Type(IntEnum) :
     NEW = 1
     EDIT = 2
     REMOVE = 3
     CHECK = 4
+    OPEN = 5 # file open
+    UNDO = 6
+    REDO = 7
 
 # root アドレスのアクセス処理
 @app.route("/")
 def hello():
-    return render_template("index.html", memos=data.memo)
+    print(data.filename)
+    return render_template("index.html", filename=data.filename, memos=data.memo)
 
 
 # メモがクリックされるとここが実行される

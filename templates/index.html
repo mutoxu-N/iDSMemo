@@ -8,6 +8,10 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script> 
 </head>
 <body>
+<div id="header">
+    <p id="file">{{ filename }}</p>
+    <p><button id="open">Open</button>  <button id="undo">Undo</button>  <button id="redo">Redo</button></p>
+</div>
 <div id="container">
     {% for memo in memos %}
         <div class="memo">
