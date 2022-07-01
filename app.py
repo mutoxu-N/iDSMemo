@@ -1,24 +1,26 @@
-from enum import Enum, IntEnum
+from enum import IntEnum
 from flask import Flask, Response, jsonify, render_template, request
-import memo_data
+import memo_data, memo_config
 
 app = Flask(__name__)
 data = memo_data.MemoData("memo.ids")
+config = memo_config.MemoConfig()
 
 class Type(IntEnum) :
     NEW = 1
     EDIT = 2
     REMOVE = 3
     CHECK = 4
-    OPEN = 5 # file open
-    UNDO = 6
-    REDO = 7
+    F_OPEN = 5
+    F_NEW = 6 
+    UNDO = 7
+    REDO = 8
 
 # root アドレスのアクセス処理
 @app.route("/")
 def hello():
     print(data.filename)
-    return render_template("index.html", filename=data.filename, memos=data.memo)
+    return render_template("index.html", filename=config.filename, memos=data.memo)
 
 
 # メモがクリックされるとここが実行される

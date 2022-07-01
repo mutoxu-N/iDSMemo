@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-    <link rel="stylesheet" href="/static/css/style.css"> 
+    <link rel="stylesheet" href="/static/css/header.css"> 
+    <link rel="stylesheet" href="/static/css/contents.css"> 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script> 
 </head>
 <body>
+
 <div id="header">
-    <p id="file">{{ filename }}</p>
-    <p><button id="open">Open</button>  <button id="undo">Undo</button>  <button id="redo">Redo</button></p>
+    <div id="file">{{ filename }}</div>
+    <div id="buttons">
+        <br><button id="new">NEW</button>  <button id="open">Open</button>  <button id="undo">Undo</button>  <button id="redo">Redo</button>
+    </div>
 </div>
+
 <div id="container">
     {% for memo in memos %}
         <div class="memo">
@@ -22,6 +27,7 @@
     {% endfor %}
     <div id="last" contenteditable="true"><br></div>
 </div>
+
 <script type="text/javascript" src="/static/js/script.js"></script> 
 </body>
 </html>

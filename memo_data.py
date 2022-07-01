@@ -17,7 +17,7 @@ class MemoData():
         return self.__filename
 
     def save(self) -> None:
-        joblib.dump(self.__memos, "memo", compress=3)
+        joblib.dump(self.__memos, self.filename, compress=3)
 
     def add(self, txt) -> None:
         self.__memos.append(txt)
