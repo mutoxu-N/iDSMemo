@@ -1,7 +1,8 @@
 const addr = "http://127.0.0.1:8080/";
-const Type = {new: 1, edit:2, remove:3, check: 4, f_open:5, f_new: 6, undo:7, redo: 8};
+const Type = {new: 1, edit:2, remove:3, check: 4, f_open:5, f_new: 6, undo:7, redo: 8, all_remove:9};
 const KeyNum = {enter: 13, end: 35, home: 36, up: 38, down: 40, left: 37, right: 39, backspace: 8};
 cursorPos = null
+filename = null
 memoData = {}
 
 function send(data) {
@@ -13,7 +14,8 @@ function send(data) {
         contentType: 'application/json'
 
     }).done(function(res, textStatus, jqXHR ){
-        memoData = res;
+        filename = res[0]
+        memoData = res[1];
         reload(data);
 
     }).fail(function(jqXHR, textStatus, errorThrown){
@@ -22,7 +24,7 @@ function send(data) {
     });
 }
 
-function get_memo_idx(element) { return $(element).index(); }
+    function get_memo_idx(element) { return $(element).index(); }
 function add() { send({type: Type["new"], text: $(':focus').text()}); $("div#last").empty(); }
 function edit(down=true) { 
     id = get_memo_idx($(':focus').parent().parent().parent());
@@ -53,6 +55,9 @@ function set_focus(element) {
 }
 
 function reload(data) {
+    // update filename
+    $('#file').text(filename)
+
     // remove all children
     $("#container > div.memo ").remove()
 
@@ -162,6 +167,12 @@ $("div#last").keydown((e) => {
             cursorPos = document.getSelection().focusOffset + 1;
     }
 });
+
+$('button#new').click((e) => { send({type: Type["f_new"]}); })
+$('button#open').click((e) => { send({type: Type["f_open"]}); })
+$('button#undo').click((e) => { send({type: Type["f_undo"]}); })
+$('button#redo').click((e) => { send({type: Type["f_redo"]}); })
+$('button#allRemove').click((e) => { send({type: Type["all_remove"]}); })
 
 // get data from flask and display
 send({type: Type["check"]});

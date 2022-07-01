@@ -1,10 +1,13 @@
 from enum import IntEnum
+from tkinter import filedialog
 from flask import Flask, Response, jsonify, render_template, request
-import memo_data, memo_config
+from memo_data import MemoData
+from memo_config import MemoConfig
+import os
 
 app = Flask(__name__)
-data = memo_data.MemoData("memo.ids")
-config = memo_config.MemoConfig()
+config = MemoConfig()
+data = MemoData(config.url)
 
 class Type(IntEnum) :
     NEW = 1
@@ -15,12 +18,12 @@ class Type(IntEnum) :
     F_NEW = 6 
     UNDO = 7
     REDO = 8
+    ALL_REMOVE = 9
 
 # root アドレスのアクセス処理
 @app.route("/")
 def hello():
-    print(data.filename)
-    return render_template("index.html", filename=config.filename, memos=data.memo)
+    return render_template("index.html", filename=data.filename, memos=data.memo)
 
 
 # メモがクリックされるとここが実行される
@@ -31,28 +34,37 @@ def memo_clicked():
             return "ERROR"
             
     js = request.json
-    httpRes = 200 # OK used as check
     
     if js["type"] == Type.NEW:
         if js["text"] != "":
             data.add(js["text"])
-        httpRes = 201 # Created
 
     elif js["type"] == Type.EDIT:
         if js["text"] == "":
             data.remove(js["id"])
         else: 
             data.set(js["id"], js["text"])
-        httpRes = 202 # Accepted used as edit
 
     elif js["type"] == Type.REMOVE:
         data.remove(js["id"])
-        httpRes = 203 # Non-Authoritative Information used as remove
 
+    # TODO 2回目以降、新規ファイル作成やファイルを開くのができなくなる。Electronでファイルを読み込んで通信するのが吉
+    elif js["type"] == Type.F_NEW:
+        config.setDir(filedialog.asksaveasfilename(filetypes = [('メモファイル', '*.ids')], initialdir = config.dir))
+        data.load(config.url)
+
+    elif js["type"] == Type.F_OPEN:
+        url = filedialog.askopenfilename(filetypes = [('メモファイル', '*.ids')], initialdir = config.dir)
+        if os.path.exists(url):
+            config.setDir(url)
+        else:
+            config.setDir(url)
+        data.load(config.url)
+        
     # print(js)
-    return jsonify(data.memo), httpRes
+    return jsonify([data.filename, data.memo]), 200
 
 
 if __name__ == "__main__":
-    # flask 実行
+    # flask 
     app.run(host="127.0.0.1", port=8080, debug=True)

@@ -3,6 +3,10 @@ import joblib, os
 class MemoData():
     def __init__(self, filename) -> None:
         self.__filename = filename
+        self.load(filename)
+
+    def load(self, filename) -> None:
+        self.__filename = filename
         if os.path.exists(filename):
             self.__memos = joblib.load(filename)
         else:
@@ -14,8 +18,8 @@ class MemoData():
 
     @property
     def filename(self) -> str:
-        return self.__filename
-
+        return self.__filename.split('/')[-1]
+        
     def save(self) -> None:
         joblib.dump(self.__memos, self.filename, compress=3)
 

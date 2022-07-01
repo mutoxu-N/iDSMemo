@@ -3,7 +3,7 @@ import joblib, os
 class MemoConfig():
     def __init__(self):
         # __config
-        # 0: opening file  1:file open url
+        # 0: opening file url
         self.__config = []
         self.load()
 
@@ -14,23 +14,20 @@ class MemoConfig():
         if os.path.exists("config.cfg"):
             self.__config = joblib.load("config.cfg")
         else:
-            self.__config = ["memo.ids", "C:"]
+            self.__config = ["C:memo.ids"]
     
     @property
-    def filename(self) -> str:
+    def url(self) -> str:
         self.load()
         return self.__config[0]
 
     @property
-    def dirname(self) -> str:
+    def dir(self) -> str:
         self.load()
-        return self.__config[1]
+        return  '/'.join(self.url.split('/')[:-1])
 
-    def setFilename(self, name: str) -> None:
-        self.__config[0] = name
-        self.save()
 
     def setDir(self, url: str) -> None:
-        self.__config[1] = url
+        self.__config[0] = url
         self.save()
     

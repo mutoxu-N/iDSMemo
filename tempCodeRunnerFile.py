@@ -1,2 +1,1 @@
-
-    # flask 実行
+config.dir + "/" + config.filename
