@@ -5,6 +5,10 @@ cursorPos = null
 filename = null
 memoData = {}
 
+/**
+ * データをFlaskに送信する
+ * @param {object} data 
+ */
 function send(data) {
     $.ajax({
         url:addr + "receive",
@@ -24,8 +28,22 @@ function send(data) {
     });
 }
 
-    function get_memo_idx(element) { return $(element).index(); }
+/**
+ * div要素からメモのインデックスを取得する
+ * @param {any} element メモの要素
+ * @returns number インデックス
+ */
+function get_memo_idx(element) { return $(element).index(); }
+
+/**
+ * データ追加のための情報を整理
+ */
 function add() { send({type: Type["new"], text: $(':focus').text()}); $("div#last").empty(); }
+
+/**
+ * データ編集のための情報を整理
+ * @param {bool} down 編集後のカーソル位置が、1つ下か否か
+ */
 function edit(down=true) { 
     id = get_memo_idx($(':focus').parent().parent().parent());
     if(memoData[get_memo_idx($(':focus').parent().parent().parent())] != $(':focus').text())
@@ -33,6 +51,10 @@ function edit(down=true) {
         else     send({type: Type["edit"], id: id, text: $(':focus').text(), next: id});
 }
 
+/**
+ * 指定した要素にフォーカスを合わせる
+ * @param {any} element フォーカスを合わせる要素
+ */
 function set_focus(element) {
 
     // calc cursor position
@@ -54,6 +76,10 @@ function set_focus(element) {
     selection.addRange(r);
 }
 
+/**
+ * 画面をリロードする
+ * @param {object} data Flaskに送信したデータ
+ */
 function reload(data) {
     // update filename
     $('#file').text(filename)

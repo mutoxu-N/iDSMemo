@@ -13,13 +13,19 @@ data = MemoData(config.url)
 
 # root アドレスのアクセス処理
 @app.route("/")
-def hello():
+def root():
+    """
+    メイン画面を出力
+    """
     return render_template("index.html", filename=data.filename, memos=data.memo)
 
 
 # メモがクリックされるとここが実行される
 @app.route("/receive", methods=["POST"])
-def memo_clicked():
+def received():
+    """
+    JavaScriptからデータを受信したときの処理
+    """
     if request.headers['Content-Type'] != 'application/json':
             print(request.headers['Content-Type'])
             return "ERROR"
