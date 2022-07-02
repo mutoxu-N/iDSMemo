@@ -14,7 +14,7 @@ class MemoConfig():
         if os.path.exists("config.cfg"):
             self.__config = joblib.load("config.cfg")
         else:
-            self.__config = ["C:memo.ids"]
+            self.__config = ["C:/memo.ids"]
     
     @property
     def url(self) -> str:

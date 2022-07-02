@@ -32,12 +32,12 @@ div#file {
     margin-bottom: 0px;
 }
 
-button#new, button#open, button#undo, button#redo {
+div#buttons button {
     padding: 5px 15px;
     background-color: white;
 }
 
-button#new:hover, button#open:hover, button#undo:hover, button#redo:hover {
+div#buttons button:hover {
     padding: 5px 15px;
     color: white;
     background-color: black;

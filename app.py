@@ -1,24 +1,15 @@
-from enum import IntEnum
 from tkinter import filedialog
 from flask import Flask, Response, jsonify, render_template, request
 from memo_data import MemoData
 from memo_config import MemoConfig
+from type import Type
 import os
 
 app = Flask(__name__)
 config = MemoConfig()
 data = MemoData(config.url)
 
-class Type(IntEnum) :
-    NEW = 1
-    EDIT = 2
-    REMOVE = 3
-    CHECK = 4
-    F_OPEN = 5
-    F_NEW = 6 
-    UNDO = 7
-    REDO = 8
-    ALL_REMOVE = 9
+
 
 # root アドレスのアクセス処理
 @app.route("/")
@@ -43,23 +34,32 @@ def memo_clicked():
         if js["text"] == "":
             data.remove(js["id"])
         else: 
-            data.set(js["id"], js["text"])
+            data.edit(js["id"], js["text"])
 
     elif js["type"] == Type.REMOVE:
         data.remove(js["id"])
 
     # TODO 2回目以降、新規ファイル作成やファイルを開くのができなくなる。Electronでファイルを読み込んで通信するのが吉
     elif js["type"] == Type.F_NEW:
-        config.setDir(filedialog.asksaveasfilename(filetypes = [('メモファイル', '*.ids')], initialdir = config.dir))
-        data.load(config.url)
+        url = filedialog.asksaveasfilename(filetypes = [('メモファイル', '*.ids')], initialdir = config.dir)
+        if url != "":
+            config.setDir()
+            data.load(config.url)
 
     elif js["type"] == Type.F_OPEN:
         url = filedialog.askopenfilename(filetypes = [('メモファイル', '*.ids')], initialdir = config.dir)
-        if os.path.exists(url):
-            config.setDir(url)
-        else:
-            config.setDir(url)
-        data.load(config.url)
+        if url != "":
+            if os.path.exists(url):
+                config.setDir(url)
+            else:
+                config.setDir(url)
+            data.load(config.url)
+
+    elif js["type"] == Type.UNDO:
+        data.undo()
+
+    elif js["type"] == Type.REDO:
+        data.redo()
         
     # print(js)
     return jsonify([data.filename, data.memo]), 200

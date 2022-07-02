@@ -170,8 +170,8 @@ $("div#last").keydown((e) => {
 
 $('button#new').click((e) => { send({type: Type["f_new"]}); })
 $('button#open').click((e) => { send({type: Type["f_open"]}); })
-$('button#undo').click((e) => { send({type: Type["f_undo"]}); })
-$('button#redo').click((e) => { send({type: Type["f_redo"]}); })
+$('button#undo').click((e) => { send({type: Type["undo"]}); })
+$('button#redo').click((e) => { send({type: Type["redo"]}); })
 $('button#allRemove').click((e) => { send({type: Type["all_remove"]}); })
 
 // get data from flask and display
