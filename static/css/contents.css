@@ -1,0 +1,57 @@
+body{
+    text-align: center;
+    background-color: gray;
+}
+
+div#container {
+    width: 80%;
+    height: auto;
+    display: inline-block;
+    text-align: left;
+    padding: 3%;
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.5em;
+    background-color: white;
+    overflow: hidden;
+}
+
+div.memo {
+    overflow: hidden;
+    color: black;
+    padding: 5px;
+    margin: 3px;
+}
+
+div.memo:hover {
+    background-color: lightblue;
+}
+
+div#last {
+    padding: 5px;
+    text-align: left;
+    border-style: dotted;
+}
+
+div.memo:focus-within, #last:focus{
+    border-style: solid;
+    border-width: 2px;
+    border-color: lightcoral;
+    background-color: lightcyan;
+}
+
+div.content{
+    flex: 1;
+    float: left;
+    width: calc(100% - 60px);
+    outline: 0px solid transparent;
+}
+
+
+button.rm {
+    float: left;
+    max-height: 100%;
+    height: auto;
+    width: 60px;
+    margin-top: auto;
+}
