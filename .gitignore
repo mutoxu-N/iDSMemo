@@ -1,9 +1,0 @@
-node_modules
-env1
-__pycache__
-memo.code-workspace
-settings.json
-form.drawio
-config.cfg
-*.ids
-test.py
