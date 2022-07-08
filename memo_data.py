@@ -19,11 +19,10 @@ class MemoData():
         """
         self.__filename = path # メモデータのファイル名
 
-        self.__process = [None for _ in [None]*5] # undo/redo環の配列
-        self.__currentCursor = 0 # undo/redo環のカーソル
+        self.__process = [None for _ in [None]*32] # undo/redo環の配列
+        self.__currentCursor = -1 # undo/redo環のカーソル -1のときはundo下限をundoしたとき
         self.__undoLimit = 0 # undo/redo環のUNDO限界値
         self.__redoLimit = -1 # undo/redo環のREDO限界値
-        self.__canRedo = False # undo/redo環でのredo可否
 
         if os.path.exists(path):
             self.__data = joblib.load(path)
@@ -55,7 +54,7 @@ class MemoData():
         joblib.dump(self.__data, self.filename, compress=3)
 
         
-    def add(self, txt, tmpUUID=None, notDo=True) -> None:
+    def add(self, txt, prevUUID=None, log=True) -> None:
         """
         メモにデータを追加する
         
@@ -65,15 +64,15 @@ class MemoData():
             notDo (bool, optional): undo/redo のときはFalseに設定
 
         """
-        if tmpUUID is None:
-            tmpUUID = uuid.uuid4()
-        if notDo: # not logged when undo/redo
-            self.__do(Type.NEW, tmpUUID, txt)
-        self.__data.append([tmpUUID, txt])
+        if prevUUID is None:
+            prevUUID = uuid.uuid4()
+        if log: # not logged when undo/redo
+            self.__do(Type.NEW, prevUUID, txt)
+        self.__data.append([prevUUID, txt])
         self.save()
         
 
-    def remove(self, idx: int, notDo=True) -> None:
+    def remove(self, idx: int, log=True) -> None:
         """
         メモからデータを削除する
 
@@ -81,13 +80,13 @@ class MemoData():
             idx (int): 削除するデータのインデックス
             notDo (bool, optional): undo/redo のときはFalseに設定
         """
-        if notDo: # not logged when undo/redo
+        if log: # not logged when undo/redo
             self.__do(Type.REMOVE, self.__data[idx][0], self.__data[idx][1])
         self.__data[idx:idx+1] = []
         self.save()
 
 
-    def edit(self, idx: int, txt: str, notDo=True) -> None:
+    def edit(self, idx: int, txt: str, log=True) -> None:
         """
         メモデータを編集する
 
@@ -95,9 +94,18 @@ class MemoData():
             idx (int): 編集するデータのインデックス
             txt (str): 編集後のメモの内容
             notDo (bool, optional): undo/redo のときはFalseに設定"""
-        if notDo: # not logged when undo/redo
+        if log: # not logged when undo/redo
             self.__do(Type.EDIT, self.__data[idx][0], {"before": self.__data[idx][1], "after": txt})
         self.__data[idx][1] = txt
+
+
+    def removeAll(self, log=True) -> None:
+        """
+        全てのメモデータを削除する
+        """
+        if log:
+            self.__do(Type.ALL_REMOVE, None, self.__data)
+        self.__data = []
 
 
     def __do(self, action: Type, uuid: uuid.UUID, content) -> None:
@@ -119,8 +127,9 @@ class MemoData():
         self.__redoLimit = self.__next(self.__currentCursor)
         self.__currentCursor = self.__redoLimit
         self.__process[self.__currentCursor] = [uuid, action, content]
+        self.__canUndo = True
 
-        if(self.__undoLimit == self.__redoLimit and self.__process[-1]):
+        if(self.__undoLimit == self.__redoLimit and not self.__process[-1] is None):
             self.__undoLimit = self.__next(self.__undoLimit)
 
 
@@ -148,22 +157,29 @@ class MemoData():
         """
         undo処理を行う
         """
+        if(self.__currentCursor == -1): # UndoLimit のプロセスをundoした後
+            return 
+
+        process = self.__process[self.__currentCursor] # [uuid, action, content]
+
         if(self.__currentCursor == self.__undoLimit): # cannot undo
-            return
+            self.__currentCursor = -1
 
-        pos = self.__currentCursor
-        if self.__process[pos][1] == Type.NEW:
-            self.remove(self.__get_idx_from_uuid(self.__process[pos][0]), notDo=False) # remove from uuid
+        if process[1] == Type.NEW:
+            self.remove(self.__get_idx_from_uuid(process[0]), log=False) # remove from uuid
 
-        elif self.__process[pos][1] == Type.EDIT:
-            self.set(self.__get_idx_from_uuid(self.__process[pos][0]), 
-                     self.__process[pos][2]["before"], notDo=False) # edit to before content from uuid
+        elif process[1] == Type.EDIT:
+            self.edit(self.__get_idx_from_uuid(process[0]), 
+                     process[2]["before"], log=False) # edit to before content from uuid
 
-        elif self.__process[pos][1] == Type.REMOVE:
-            self.add(self.__process[pos][2], tmpUUID=self.__process[pos][0], notDo=False) # add with same uuid
+        elif process[1] == Type.REMOVE:
+            self.add(process[2], prevUUID=process[0], log=False) # add with same uuid
 
-        self.__canRedo = True
-        self.__currentCursor = self.__prev(pos)
+        elif process[1] == Type.ALL_REMOVE:
+            self.__data = process[2]
+
+        if(not self.__currentCursor < 0):
+            self.__currentCursor = self.__prev(self.__currentCursor)
 
 
     def redo(self) -> None:
@@ -171,24 +187,27 @@ class MemoData():
         redo処理を行う
         """
         if(self.__currentCursor == self.__redoLimit):
-            self.__canRedo = False
-        else:
-            self.__currentCursor = self.__next(self.__currentCursor)
-
-        pos = self.__currentCursor
-        if(not self.__canRedo): # cannot redo
             return
 
+        else:
+            if(self.__currentCursor < 0):
+                self.__currentCursor = self.__undoLimit
+            else:
+                self.__currentCursor = self.__next(self.__currentCursor)
 
-        if self.__process[pos][1] == Type.NEW:
-            self.add(self.__process[pos][2], tmpUUID=self.__process[pos][0], notDo=False) # add with same uuid
+        process = self.__process[self.__currentCursor] # [uuid, action, content]
+        if process[1] == Type.NEW:
+            self.add(process[2], prevUUID=process[0], log=False) # add with same uuid
 
-        elif self.__process[pos][1] == Type.EDIT:
-            self.set(self.__get_idx_from_uuid(self.__process[pos][0]), 
-                     self.__process[pos][2]["after"], notDo=False) # edit to before content from uuid
+        elif process[1] == Type.EDIT:
+            self.edit(self.__get_idx_from_uuid(process[0]), 
+                     process[2]["after"], log=False) # edit to before content from uuid
 
-        elif self.__process[pos][1] == Type.REMOVE:
-            self.remove(self.__get_idx_from_uuid(self.__process[pos][0]), notDo=False) # remove from uuid
+        elif process[1] == Type.REMOVE:
+            self.remove(self.__get_idx_from_uuid(process[0]), log=False) # remove from uuid
+
+        elif process[1] == Type.ALL_REMOVE:
+            self.removeAll(log=False)
 
 
     def __get_idx_from_uuid(self, uuid) -> int:

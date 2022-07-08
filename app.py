@@ -66,6 +66,9 @@ def received():
 
     elif js["type"] == Type.REDO:
         data.redo()
+
+    elif js["type"] == Type.ALL_REMOVE:
+        data.removeAll()
         
     return jsonify([data.filename, data.memo]), 200
 

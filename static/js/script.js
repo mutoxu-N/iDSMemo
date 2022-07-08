@@ -47,8 +47,11 @@ function add() { send({type: Type["new"], text: $(':focus').text()}); $("div#las
 function edit(down=true) { 
     id = get_memo_idx($(':focus').parent().parent().parent());
     if(memoData[get_memo_idx($(':focus').parent().parent().parent())] != $(':focus').text())
-        if(down) send({type: Type["edit"], id: id, text: $(':focus').text(), next: id+2});
-        else     send({type: Type["edit"], id: id, text: $(':focus').text(), next: id});
+        text = $(':focus').text();
+        if(down) {
+            if(text == "") send({type: Type["edit"], id: id, text: $(':focus').text(), next: id+1});
+            else send({type: Type["edit"], id: id, text: $(':focus').text(), next: id+2});
+        } else     send({type: Type["edit"], id: id, text: $(':focus').text(), next: id});
 }
 
 /**
@@ -151,8 +154,10 @@ function reload(data) {
         case Type["new"]:
             set_focus($('div#last'));
             break;
+            
         case Type["edit"]:
-            set_focus($('#container > div.memo:nth-child(' + (data.next) + ') > ul > li > div.content'));
+            if(memoData.length < data.next) set_focus($('div#last'));
+            else set_focus($('#container > div.memo:nth-child(' + (data.next) + ') > ul > li > div.content'));
             break;
     }
 
