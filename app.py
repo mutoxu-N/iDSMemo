@@ -3,7 +3,7 @@ from flask import Flask, Response, jsonify, render_template, request
 from memo_data import MemoData
 from memo_config import MemoConfig
 from type import Type
-import os
+import os, requests, json
 
 app = Flask(__name__)
 config = MemoConfig()
@@ -45,15 +45,19 @@ def received():
     elif js["type"] == Type.REMOVE:
         data.remove(js["id"])
 
-    # TODO 2回目以降、新規ファイル作成やファイルを開くのができなくなる。Electronでファイルを読み込んで通信するのが吉
     elif js["type"] == Type.F_NEW:
-        url = filedialog.asksaveasfilename(filetypes = [('メモファイル', '*.ids')], initialdir = config.dir)
+        res = requests.get("http://127.0.0.1:8081/electron", headers={'content-type': 'application/json'},
+            data=json.dumps({"type": Type.F_NEW, "url": config.dir}))
+
+        url = res.content.decode()
         if url != "":
-            config.setDir()
-            data.load(config.url)
+            config.setDir(url)
+            data.load(url)
 
     elif js["type"] == Type.F_OPEN:
-        url = filedialog.askopenfilename(filetypes = [('メモファイル', '*.ids')], initialdir = config.dir)
+        res = requests.get("http://127.0.0.1:8081/electron", headers={'content-type': 'application/json'},
+            data=json.dumps({"type": Type.F_OPEN, "url": config.dir}))
+        url = res.content.decode()
         if url != "":
             if os.path.exists(url):
                 config.setDir(url)

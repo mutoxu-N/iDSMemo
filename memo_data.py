@@ -44,7 +44,7 @@ class MemoData():
         """
         ファイル名を拡張子付きで返す
         """
-        return self.__filename.split('/')[-1]
+        return self.__filename.split('\\')[-1].split(".")[0]
         
 
     def save(self) -> None:

@@ -1,6 +1,11 @@
 // Electron 初期設定
+const Type = {f_open:5, f_new: 6};
 const {PythonShell} = require('python-shell');
+const express = require("express");
+const server = express();
+const bodyParser = require('body-parser');
 const electron = require('electron');
+const { dialog } = require('electron')
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 let mainWindow;
@@ -26,7 +31,7 @@ app.on('ready', function() {
     mainWindow.loadURL(addr);
 
     // 開発ツール
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     // 終了したとき
     mainWindow.on('closed', function() {
@@ -50,4 +55,37 @@ app.on('ready', function() {
   };
 
   startUp();
+});
+
+
+
+// HTTP GET を受け取る
+// ファイルを選択・新規作成の処理
+server.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
+server.listen(8081, function() {});
+server.get('/electron', function(req, res) {    
+    switch(req.body["type"]) {
+        // ファイル選択ダイアログ
+        case Type["f_open"]: 
+            url = dialog.showOpenDialogSync({
+                title: "メモファイルを開く",
+                defaultPath: req.body["url"],
+                filters: [{name: 'メモファイル', extensions: ['ids']}],
+                properties: ['openFile']
+            });
+            if(url) res.send(url[0])
+            break;
+
+        // ファイル新規作成ダイアログ
+        case Type["f_new"]: 
+            url = dialog.showSaveDialogSync({
+                title: "新規メモファイル",
+                defaultPath: req.body["url"],
+                filters: [{name: 'メモファイル', extensions: ['ids']}],
+                properties: ['createDirectory']
+            });
+            if(url) res.send(url);
+            break;
+    }
 });

@@ -40,6 +40,7 @@ class MemoConfig():
             self.__config = joblib.load("config.cfg")
         else:
             self.__config = ["C:/memo.ids"]
+            self.save()
     
 
     def setDir(self, url: str) -> None:
@@ -49,6 +50,9 @@ class MemoConfig():
         Args:
             url (str): 設定したいファイルパス
         """
-        self.__config[0] = url
-        self.save()
+        if os.path.exists(url):
+            self.__config[0] = url
+            self.save()
+        else:
+            joblib.dump([], url, compress=3)
     
