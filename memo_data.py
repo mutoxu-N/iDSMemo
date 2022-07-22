@@ -51,7 +51,7 @@ class MemoData():
         """
         メモデータをファイルに保存する
         """
-        joblib.dump(self.__data, self.filename, compress=3)
+        joblib.dump(self.__data, self.filename+".ids", compress=3)
 
         
     def add(self, txt, prevUUID=None, log=True) -> None:
