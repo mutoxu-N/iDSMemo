@@ -59,7 +59,6 @@ class MemoData():
         """
         メモデータをファイルに保存する
         """
-        print(self.filename)
         joblib.dump(self.__data, self.filename, compress=3)
 
         

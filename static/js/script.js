@@ -58,11 +58,12 @@ function add() { send({type: Type["new"], text: $(':focus').text()}); $("div#las
 function edit(down=true) { 
     id = get_memo_idx($(':focus').parent().parent().parent());
     if(memoData[get_memo_idx($(':focus').parent().parent().parent())] != $(':focus').text())
+        $(':focus');
         text = $(':focus').text();
         if(down) {
             if(text == "") send({type: Type["edit"], id: id, text: $(':focus').text(), next: id+1});
             else send({type: Type["edit"], id: id, text: $(':focus').text(), next: id+2});
-        } else     send({type: Type["edit"], id: id, text: $(':focus').text(), next: id});
+        } else send({type: Type["edit"], id: id, text: $(':focus').text(), next: id});
 }
 
 /**
@@ -218,11 +219,11 @@ $("div#last").keydown((e) => {
     }
 });
 
-$('button#new').click((e) => { send({type: Type["f_new"]}); })
-$('button#open').click((e) => { send({type: Type["f_open"]}); })
-$('button#undo').click((e) => { send({type: Type["undo"]}); })
-$('button#redo').click((e) => { send({type: Type["redo"]}); })
-$('button#allRemove').click((e) => { send({type: Type["all_remove"]}); })
+$('button#new').click((e) => { send({type: Type["f_new"]}); $('button#new').blur(); })
+$('button#open').click((e) => { send({type: Type["f_open"]}); $('button#open').blur(); })
+$('button#undo').click((e) => { send({type: Type["undo"]}); $('button#undo').blur(); })
+$('button#redo').click((e) => { send({type: Type["redo"]}); $('button#redo').blur(); })
+$('button#allRemove').click((e) => { send({type: Type["all_remove"]}); $('button#allRemove').blur(); })
 
 // get data from flask and display
 send({type: Type["check"]});
