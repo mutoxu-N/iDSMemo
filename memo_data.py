@@ -7,8 +7,9 @@ class MemoData():
     メモデータを管理するクラス
     """
     def __init__(self, filename) -> None:
-        self.__filename = filename
-        self.load(filename)
+        if filename is not None:
+            self.__filename = filename
+            self.load(filename)
 
     def load(self, path) -> None:
         """
@@ -44,17 +45,25 @@ class MemoData():
         """
         ファイル名を拡張子付きで返す
         """
-        return self.__filename.split('\\')[-1].split(".")[0]
+        return self.__filename.split('\\')[-1]
+
+    @property
+    def filenameWithNoExt(self) -> str:
+        """
+        拡張子の付いていいないファイル名を返す
+        """
+        return self.filename.split('.')[0]
         
 
     def save(self) -> None:
         """
         メモデータをファイルに保存する
         """
+        print(self.filename)
         joblib.dump(self.__data, self.filename, compress=3)
 
         
-    def add(self, txt, prevUUID=None, log=True) -> None:
+    def add(self, txt: str, prevUUID:uuid.UUID=None, log=True) -> None:
         """
         メモにデータを追加する
         

@@ -17,7 +17,10 @@ def root():
     """
     メイン画面を出力
     """
-    return render_template("index.html", filename=data.filename, memos=data.memo)
+    if config.url is not None:
+        return render_template("index.html", filename=data.filename, memos=data.memo)
+    else:
+        return render_template("index.html", filename="", memos=[])
 
 
 # メモがクリックされるとここが実行される
@@ -46,8 +49,12 @@ def received():
         data.remove(js["id"])
 
     elif js["type"] == Type.F_NEW:
-        res = requests.get("http://127.0.0.1:8081/electron", headers={'content-type': 'application/json'},
-            data=json.dumps({"type": Type.F_NEW, "url": config.dir}))
+        if config.url is None:
+            res = requests.get("http://127.0.0.1:8081/electron", headers={'content-type': 'application/json'},
+                data=json.dumps({"type": Type.F_NEW, "url": ""}))
+        else:
+            res = requests.get("http://127.0.0.1:8081/electron", headers={'content-type': 'application/json'},
+                data=json.dumps({"type": Type.F_NEW, "url": config.dir}))
 
         url = res.content.decode()
         if url != "":
@@ -55,15 +62,17 @@ def received():
             data.load(url)
 
     elif js["type"] == Type.F_OPEN:
-        res = requests.get("http://127.0.0.1:8081/electron", headers={'content-type': 'application/json'},
-            data=json.dumps({"type": Type.F_OPEN, "url": config.dir}))
+        if config.url is None:
+            res = requests.get("http://127.0.0.1:8081/electron", headers={'content-type': 'application/json'},
+                data=json.dumps({"type": Type.F_OPEN, "url": ""}))
+        else:
+            res = requests.get("http://127.0.0.1:8081/electron", headers={'content-type': 'application/json'},
+                data=json.dumps({"type": Type.F_OPEN, "url": config.dir}))
         url = res.content.decode()
         if url != "":
             if os.path.exists(url):
                 config.setDir(url)
-            else:
-                config.setDir(url)
-            data.load(config.url)
+                data.load(config.url)
 
     elif js["type"] == Type.UNDO:
         data.undo()
@@ -73,8 +82,11 @@ def received():
 
     elif js["type"] == Type.ALL_REMOVE:
         data.removeAll()
+
+    elif js["type"] == Type.CHECK and config.url is None:
+        return jsonify([]), 200
         
-    return jsonify([data.filename, data.memo]), 200
+    return jsonify([data.filenameWithNoExt, data.memo]), 200
 
 
 if __name__ == "__main__":
