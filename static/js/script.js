@@ -25,6 +25,11 @@ function send(data) {
             memoData = res[1];
             isFileOpen = true
         }
+        $('button#new').blur()
+        $('button#open').blur()
+        $('button#undo').blur()
+        $('button#redo').blur()
+        $('button#allRemove').blur()
         reload(data);
 
     }).fail(function(jqXHR, textStatus, errorThrown){
