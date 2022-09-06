@@ -18,10 +18,10 @@ app.on('window-all-closed', function() {
 // 起動後処理
 app.on('ready', function() {
   // Python 実行
-//   PythonShell.run('./app.py', null, function (err, result) {  // exe:'./resources/app/app.py'    edit: './app.py'
-//     if (err) throw err;
-//     console.log(result);
-//   });
+  PythonShell.run('./app.py', null, function (err, result) {  // exe:'./resources/app/app.py'    edit: './app.py'
+    if (err) throw err;
+    console.log(result);
+  });
 
   const rp = require('request-promise');
   const addr = 'http://127.0.0.1:8080'; // アドレス
