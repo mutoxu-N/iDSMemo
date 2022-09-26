@@ -31,7 +31,7 @@ app.on('ready', function() {
     mainWindow.loadURL(addr);
 
     // 開発ツール
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     // 終了したとき
     mainWindow.on('closed', function() {

@@ -1,6 +1,7 @@
 const addr = "http://127.0.0.1:8080/";
 const Type = {new: 1, edit:2, remove:3, check: 4, f_open:5, f_new: 6, undo:7, redo: 8, all_remove:9, group:10};
 const KeyNum = {enter: 13, end: 35, home: 36, up: 38, down: 40, left: 37, right: 39, backspace: 8};
+isFileOpen = false
 cursorPos = null
 filename = null
 memoData = {}
@@ -18,12 +19,22 @@ function send(data) {
         contentType: 'application/json'
 
     }).done(function(res, textStatus, jqXHR ){
-        filename = res[0]
-        memoData = res[1];
+        console.log(res.length)
+        if (res.length != 0) {
+            filename = res[0];
+            memoData = res[1];
+            isFileOpen = true
+        }
+        $('button#new').blur()
+        $('button#open').blur()
+        $('button#undo').blur()
+        $('button#redo').blur()
+        $('button#allRemove').blur()
         reload(data);
 
     }).fail(function(jqXHR, textStatus, errorThrown){
         console.log("failed");
+        console.log(errorThrown);
 
     });
 }
@@ -85,6 +96,13 @@ function set_focus(element) {
  * @param {object} data Flaskに送信したデータ
  */
 function reload(data) {
+
+    if (!isFileOpen) {
+        $("#file").text("NO FILE IS OPENED.")
+        return
+    }
+
+
     // update filename
     $('#file').text(filename)
 
@@ -167,6 +185,7 @@ function reload(data) {
 
 // element settings
 $("div#last").keydown((e) => {
+    if(!isFileOpen) return;
     // add
     switch(e.keyCode){
         case KeyNum["enter"]:

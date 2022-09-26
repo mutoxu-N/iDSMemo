@@ -5,7 +5,7 @@ class MemoConfig():
     このアプリの設定を管理するクラス
     """
     def __init__(self) -> None:
-        self.__config = [] # config 0:filepath
+        self.__config = [None] # config 0:filepath
         self.load() 
 
     @property
@@ -38,9 +38,6 @@ class MemoConfig():
         """
         if os.path.exists("config.cfg"):
             self.__config = joblib.load("config.cfg")
-        else:
-            self.__config = ["C:/memo.ids"]
-            self.save()
     
 
     def setDir(self, url: str) -> None:
