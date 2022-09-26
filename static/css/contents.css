@@ -41,12 +41,10 @@ div.memo:focus-within, #last:focus{
 }
 
 div.content{
-    flex: 1;
     float: left;
-    width: calc(100% - 60px);
+    width: calc(100% - 90px);
     outline: 0px solid transparent;
 }
-
 
 button.rm {
     float: left;
@@ -54,4 +52,9 @@ button.rm {
     height: auto;
     width: 60px;
     margin-top: auto;
+}
+
+input.gr {
+    float: left;
+    width: 30px;
 }

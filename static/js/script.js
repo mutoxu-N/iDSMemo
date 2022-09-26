@@ -1,5 +1,5 @@
 const addr = "http://127.0.0.1:8080/";
-const Type = {new: 1, edit:2, remove:3, check: 4, f_open:5, f_new: 6, undo:7, redo: 8, all_remove:9};
+const Type = {new: 1, edit:2, remove:3, check: 4, f_open:5, f_new: 6, undo:7, redo: 8, all_remove:9, group:10};
 const KeyNum = {enter: 13, end: 35, home: 36, up: 38, down: 40, left: 37, right: 39, backspace: 8};
 cursorPos = null
 filename = null
@@ -95,7 +95,7 @@ function reload(data) {
     for(i=0; i<memoData.length; i++) {
         $('<div class="memo">\
                 <ul style="margin-bottom: 0px;">\
-                    <li><div class="content" contenteditable="true">'+ memoData[i] +'</div><button class="rm">削除</button></li>\
+                    <li><div class="content" contenteditable="true">'+ memoData[i] +'</div><button class="rm">削除</button><input class="gr" type="checkbox"></input></li>\
                 </ul>\
             </div>'
         ).insertBefore('div#last')
@@ -205,8 +205,20 @@ $('button#open').click((e) => { send({type: Type["f_open"]}); $('button#open').b
 $('button#undo').click((e) => { send({type: Type["undo"]}); $('button#undo').blur(); })
 $('button#redo').click((e) => { send({type: Type["redo"]}); $('button#redo').blur(); })
 $('button#allRemove').click((e) => { send({type: Type["all_remove"]}); $('button#allRemove').blur(); })
+$('button#group').click((e) => { 
+
+    l = []
+    for(i=0; i<memoData.length; i++) {
+        if($('#container > div.memo:nth-child(' + (i+1) + ') > ul > li > input.gr')[0]["checked"]) {
+            l.push(i)
+        }
+    }
+
+    send({type: Type["group"], group: l}); $('button#group').blur(); 
+})
 
 // get data from flask and display
 send({type: Type["check"]});
 
 //TODO EDITフォーカスが外れたら変更内容をFlaskに送る
+//TODO Shift+Enter で改行

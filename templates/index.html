@@ -13,18 +13,11 @@
 <div id="header">
     <div id="file">{{ filename }}</div>
     <div id="buttons">
-        <br><button id="new">NEW</button>  <button id="open">Open</button>  <button id="undo">Undo</button>  <button id="redo">Redo</button>  <button id="allRemove">全削除</button>
+        <br><button id="new">NEW</button>  <button id="open">Open</button>  <button id="group">GROUP</button>  <button id="undo">Undo</button>  <button id="redo">Redo</button>  <button id="allRemove">全削除</button>
     </div>
 </div>
 
 <div id="container">
-    {% for memo in memos %}
-        <div class="memo">
-            <ul style="margin-bottom: 0px;">
-                <li><div class="content" contenteditable="true">{{ memo }}</div><button class="rm">削除</button></li>
-            </ul>    
-        </div>
-    {% endfor %}
     <div id="last" contenteditable="true"><br></div>
 </div>
 

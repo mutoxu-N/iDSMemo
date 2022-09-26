@@ -22,7 +22,7 @@ def root():
 
 # メモがクリックされるとここが実行される
 @app.route("/receive", methods=["POST"])
-def received():
+def received():    
     """
     JavaScriptからデータを受信したときの処理
     """
@@ -73,6 +73,9 @@ def received():
 
     elif js["type"] == Type.ALL_REMOVE:
         data.removeAll()
+
+    elif js["type"] == Type.GROUP:
+        data.group(js["group"])
         
     return jsonify([data.filename, data.memo]), 200
 

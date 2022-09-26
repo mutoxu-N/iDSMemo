@@ -98,6 +98,17 @@ class MemoData():
             self.__do(Type.EDIT, self.__data[idx][0], {"before": self.__data[idx][1], "after": txt})
         self.__data[idx][1] = txt
 
+    def group(self, l: list) -> None:
+        """
+        メモのグループを設定する
+
+        Args: 
+            l (list): グループを設定するインデックス
+        """
+        # TODO グループ化の処理
+        print(l)
+        pass
+
 
     def removeAll(self, log=True) -> None:
         """

@@ -9,3 +9,4 @@ class Type(IntEnum) :
     UNDO = 7
     REDO = 8
     ALL_REMOVE = 9
+    GROUP = 10
