@@ -1,6 +1,5 @@
-import joblib, os
+import joblib, os, uuid, spacy
 from type import Type
-import uuid
 
 class MemoData():
     """
@@ -35,9 +34,10 @@ class MemoData():
         """
         読み込まれているメモデータのタプルを返す
         """
+        print(self.__data)
         tmp = []
         for t in self.__data:
-            tmp.append(t[1])
+            tmp.append("".join(t[1])) # 形態素解析後のデータを結合する
         return tuple(tmp)
 
     @property
@@ -62,21 +62,27 @@ class MemoData():
         joblib.dump(self.__data, self.filename, compress=3)
 
         
-    def add(self, txt: str, prevUUID:uuid.UUID=None, log=True) -> None:
+    def add(self, txt, prevUUID:uuid.UUID=None, log=True) -> None:
         """
         メモにデータを追加する
         
         Args: 
             txt (str): 追加するメモの内容
+            txt (list): 形態素解析語のメモデータ    
             tmpUUID (uuid, optional): UUIDを指定する 指定しなければ自動で付与する
             notDo (bool, optional): undo/redo のときはFalseに設定
 
         """
         if prevUUID is None:
             prevUUID = uuid.uuid4()
+        
+        if type(txt) is str:
+            l = self.__split(txt)
+        else:
+            l = txt
         if log: # not logged when undo/redo
-            self.__do(Type.NEW, prevUUID, txt)
-        self.__data.append([prevUUID, txt])
+            self.__do(Type.NEW, prevUUID, l)
+        self.__data.append([prevUUID, l])
         self.save()
         
 
@@ -94,17 +100,24 @@ class MemoData():
         self.save()
 
 
-    def edit(self, idx: int, txt: str, log=True) -> None:
+    def edit(self, idx: int, txt, log=True) -> None:
         """
         メモデータを編集する
 
         Args:
             idx (int): 編集するデータのインデックス
             txt (str): 編集後のメモの内容
+            txt (list): 形態素解析語のメモデータ
             notDo (bool, optional): undo/redo のときはFalseに設定"""
+        
+        if type(txt) is str:
+            l = self.__split(txt)
+        else:
+            l = txt
+        
         if log: # not logged when undo/redo
-            self.__do(Type.EDIT, self.__data[idx][0], {"before": self.__data[idx][1], "after": txt})
-        self.__data[idx][1] = txt
+            self.__do(Type.EDIT, self.__data[idx][0], {"before": self.__data[idx][1], "after": l})
+        self.__data[idx][1] = l
 
     def group(self, l: list) -> None:
         """
@@ -240,3 +253,19 @@ class MemoData():
             if t[0] == uuid:
                 return self.__data.index(t)
         return -1
+
+    def __split(self, txt: str) -> list:
+        """
+        [private] 文字列を形態素して、リストを返す
+
+        Args: 
+            txt (str): 形態素解析したい文字列
+        """
+        # 形態素解析
+        nlp = spacy.load('ja_ginza_electra')
+        doc = nlp(txt)
+        l = []
+        for sent in doc.sents:
+            l.append(list(map(str, list(sent))))
+        l = sum(l, [])
+        return l
