@@ -6,9 +6,12 @@ class MemoData():
     メモデータを管理するクラス
     """
     def __init__(self, filename) -> None:
+        self.nlp = spacy.load('ja_ginza_electra') # 形態素解析
+
         if filename is not None:
             self.__filename = filename
             self.load(filename)
+        
 
     def load(self, path) -> None:
         """
@@ -29,6 +32,7 @@ class MemoData():
         else:
             self.__data = [] # [uuid, memoContents]
 
+
     @property
     def memo(self) -> str:
         """
@@ -40,12 +44,14 @@ class MemoData():
             tmp.append("".join(t[1])) # 形態素解析後のデータを結合する
         return tuple(tmp)
 
+
     @property
     def filename(self) -> str:
         """
         ファイル名を拡張子付きで返す
         """
         return self.__filename.split('\\')[-1]
+
 
     @property
     def filenameWithNoExt(self) -> str:
@@ -54,6 +60,15 @@ class MemoData():
         """
         return self.filename.split('.')[0]
         
+
+    @property
+    def memoWordsList(self) -> list:
+        l = []
+        for a in self.__data:
+            for word in a[1]:
+                l.append(word)
+        return l
+
 
     def save(self) -> None:
         """
@@ -118,6 +133,7 @@ class MemoData():
         if log: # not logged when undo/redo
             self.__do(Type.EDIT, self.__data[idx][0], {"before": self.__data[idx][1], "after": l})
         self.__data[idx][1] = l
+
 
     def group(self, l: list) -> None:
         """
@@ -254,6 +270,7 @@ class MemoData():
                 return self.__data.index(t)
         return -1
 
+
     def __split(self, txt: str) -> list:
         """
         [private] 文字列を形態素して、リストを返す
@@ -262,8 +279,7 @@ class MemoData():
             txt (str): 形態素解析したい文字列
         """
         # 形態素解析
-        nlp = spacy.load('ja_ginza_electra')
-        doc = nlp(txt)
+        doc = self.nlp(txt)
         l = []
         for sent in doc.sents:
             l.append(list(map(str, list(sent))))
