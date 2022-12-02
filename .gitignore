@@ -7,4 +7,5 @@ form.drawio
 config.cfg
 *.ids
 test.py
+test.db
 tempCodeRunnerFile.py
