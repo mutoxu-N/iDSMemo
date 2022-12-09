@@ -30,7 +30,7 @@ class MemoData():
         if os.path.exists(path):
             self.__data = joblib.load(path)
         else:
-            self.__data = [] # [uuid, memoContents]
+            self.__data = [] # [uuid, memoContents, representativeWords]
 
 
     @property
@@ -91,13 +91,11 @@ class MemoData():
         if prevUUID is None:
             prevUUID = uuid.uuid4()
         
-        if type(txt) is str:
-            l = self.__split(txt)
-        else:
-            l = txt
+        l, r = self.__split(txt)
+        
         if log: # not logged when undo/redo
             self.__do(Type.NEW, prevUUID, l)
-        self.__data.append([prevUUID, l])
+        self.__data.append([prevUUID, l, r])
         self.save()
         
 
@@ -125,14 +123,12 @@ class MemoData():
             txt (list): 形態素解析語のメモデータ
             notDo (bool, optional): undo/redo のときはFalseに設定"""
         
-        if type(txt) is str:
-            l = self.__split(txt)
-        else:
-            l = txt
+        l, r = self.__split(txt)
         
         if log: # not logged when undo/redo
             self.__do(Type.EDIT, self.__data[idx][0], {"before": self.__data[idx][1], "after": l})
         self.__data[idx][1] = l
+        self.__data[idx][2] = r
 
 
     def group(self, l: list) -> None:
@@ -271,7 +267,7 @@ class MemoData():
         return -1
 
 
-    def __split(self, txt: str) -> list:
+    def __split(self, txt: str) -> tuple:
         """
         [private] 文字列を形態素して、リストを返す
 
@@ -281,7 +277,10 @@ class MemoData():
         # 形態素解析
         doc = self.nlp(txt)
         l = []
+        rep = []
         for sent in doc.sents:
-            l.append(list(map(str, list(sent))))
-        l = sum(l, [])
-        return l
+            for token in sent:
+                if len(rep) < 3 and token.pos_ not in ['ADP', 'AUX', 'SYM']:
+                    rep.append(token.orth_)
+                l.append(token.orth_)
+        return l, rep
