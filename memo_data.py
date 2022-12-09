@@ -91,8 +91,9 @@ class MemoData():
         if prevUUID is None:
             prevUUID = uuid.uuid4()
         
+        if type(txt) is list: txt = ''.join(txt)
         l, r = self.__split(txt)
-        
+
         if log: # not logged when undo/redo
             self.__do(Type.NEW, prevUUID, l)
         self.__data.append([prevUUID, l, r])
@@ -123,6 +124,7 @@ class MemoData():
             txt (list): 形態素解析語のメモデータ
             notDo (bool, optional): undo/redo のときはFalseに設定"""
         
+        if type(txt) is list: txt = ''.join(txt)
         l, r = self.__split(txt)
         
         if log: # not logged when undo/redo
