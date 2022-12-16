@@ -313,3 +313,24 @@ class MemoData():
                 if r:  self.relation.update(words[i], words[j], r + 1)
                 else:  self.relation.update(words[i], words[j], 1)
         
+
+    def __sentenceRelation(self, idx1: int, idx2: int) -> float:
+        """
+        [private] 文同士の関連度を計算する。
+
+        Args: 
+            idx1 (int): メモのインデックス番号1
+            idx2 (int): メモのインデックス番号2
+        """
+        sum, cnt = 0, 0
+        
+        words1 = self.__data[idx1][2]
+        words2 = self.__data[idx2][2]
+        for w1 in words1:
+            for w2 in words2:
+                if w1 != w2: # 違う単語のとき
+                    r = self.relation.getRelevance(w1, w2)
+                    if r:
+                        sum += r
+                        cnt += 1
+        return sum / cnt
