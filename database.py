@@ -116,8 +116,6 @@ class Relation():
         self.conn = None
         
 
-
-
 if __name__ == '__main__':
     a = Relation()
     # a.insert("こんにちは", "オレンジ")

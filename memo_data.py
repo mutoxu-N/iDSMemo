@@ -40,7 +40,7 @@ class MemoData():
         """
         読み込まれているメモデータのタプルを返す
         """
-        print(self.__data)
+        # print(self.__data)
         tmp = []
         for t in self.__data:
             tmp.append("".join(t[1])) # 形態素解析後のデータを結合する
@@ -143,9 +143,17 @@ class MemoData():
         Args: 
             l (list): グループを設定するインデックス
         """
-        # TODO グループ化の処理
-        print(l)
-        pass
+        for i1 in range(len(l)-1):
+            for i2 in range(i1+1, len(l)):
+                # i1 行目 と i2 行目
+                words1 = self.__data[l[i1]][2]
+                words2 = self.__data[l[i2]][2]
+                for w1 in words1:
+                    for w2 in words2:
+                        if w1 != w2: # 違う単語のとき
+                            r = self.relation.getRelevance(w1, w2)
+                            if r:  self.relation.update(w1, w2, r + 5)
+                            else:  self.relation.update(w1, w2, 5)
 
 
     def removeAll(self, log=True) -> None:
@@ -290,9 +298,10 @@ class MemoData():
                 l.append(token.orth_)
         return l, rep
 
+
     def __wordsInSameSentence(self, words: list) -> None:
         """
-        同一文章内の単語の関連度を設定する
+        [private] 同一文章内の単語の関連度を設定する
 
         Args:
             words (list): 代表単語の配列
