@@ -301,5 +301,6 @@ class MemoData():
         for i in range(0, len(words)-1):
             for j in range(i+1, len(words)):
                 r = self.relation.getRelevance(words[i], words[j])
-                self.relation.update(words[i], words[j], r + 1)
+                if r:  self.relation.update(words[i], words[j], r + 1)
+                else:  self.relation.update(words[i], words[j], 1)
         

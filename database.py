@@ -17,8 +17,8 @@ class Relation():
         self.__connect()
         cursor = self.conn.cursor()
         h = self.__hashFormat(w1, w2)
-        sql = f"select * from Words where W1=\"{h[0]}\" and W2=\"{h[1]}\";"
-        cursor.execute(sql)
+        sql = "select * from Words where W1=? and W2=?;"
+        cursor.execute(sql, (h[0], h[1]))
 
         res = cursor.fetchone()
         cursor.close()
@@ -41,8 +41,8 @@ class Relation():
         self.__connect()
         cursor = self.conn.cursor()
         h = self.__hashFormat(w1, w2)
-        sql = f"select * from Words where W1=\"{h[0]}\" and W2=\"{h[1]}\";"
-        cursor.execute(sql)
+        sql = "select * from Words where W1=? and W2=?;"
+        cursor.execute(sql, (h[0], h[1]))
 
         res = cursor.fetchone() # tuple(W1, W2, R)
 
@@ -50,16 +50,16 @@ class Relation():
             sql = f"delete from Words where W1=\"{h[0]}\" and W2=\"{h[1]}\";"
             cursor.execute(sql)
         
-        self.insert(w1, w2, r)
+        self.__insert(w1, w2, r)
         
         cursor.close()
         self.conn.commit()
         self.__close()
     
 
-    def insert(self, w1: str, w2:str, r:float =0) -> None:
+    def __insert(self, w1: str, w2:str, r:float =0) -> None:
         """
-        単語同士の関連度をDBに追加する。
+        [private] 単語同士の関連度をDBに追加する。
 
         Args:
             w1 (str): 単語1
@@ -67,14 +67,12 @@ class Relation():
             r (float): 設定する関連度 (初期値=0)
         """
 
-        self.__connect()
         cursor = self.conn.cursor()
         h = self.__hashFormat(w1, w2)
-        sql = f"insert into Words(W1, W2, R) values(\"{h[0]}\", \"{h[1]}\", {r});"
-        cursor.execute(sql)
+        sql = f"insert into Words(W1, W2, R) values(?, ?, ?);"
+        cursor.execute(sql, (h[0], h[1], r))
         cursor.close()
         self.conn.commit()
-        self.__close()
 
     
     def __hashFormat(self, w1:str, w2: str) -> tuple:
@@ -104,7 +102,7 @@ class Relation():
 
     def __connect(self) -> None:
         """
-        データベースに接続する。
+        [private] データベースに接続する。
         """
         if not os.path.exists(self.filename): self.createDatabase()
         self.conn = sqlite3.connect(self.filename)
@@ -112,7 +110,7 @@ class Relation():
 
     def __close(self):
         """
-        データベースへの接続を解除する
+        [private] データベースへの接続を解除する
         """
         self.conn.close()
         self.conn = None
