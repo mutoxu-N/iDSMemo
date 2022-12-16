@@ -1,8 +1,9 @@
-import sqlite3, hashlib
+import sqlite3, hashlib, os
 
 class Relation():
-    def __init__(self) -> None:
-        self.conn = sqlite3.connect("test.db")
+    def __init__(self, filename: str) -> None:
+        self.filename = filename
+        self.conn = None
     
 
     def getRelevance(self, w1: str, w2: str) -> float:
@@ -13,6 +14,7 @@ class Relation():
             w1 (str): 単語1
             w2 (str): 単語2
         """
+        self.__connect()
         cursor = self.conn.cursor()
         h = self.__hashFormat(w1, w2)
         sql = f"select * from Words where W1=\"{h[0]}\" and W2=\"{h[1]}\";"
@@ -23,6 +25,7 @@ class Relation():
 
         ret = None
         if res:  ret = float(res[2])
+        self.__close()
         return ret
         
 
@@ -35,6 +38,7 @@ class Relation():
             w2 (str): 単語2
             r (float): 設定する関連度
         """
+        self.__connect()
         cursor = self.conn.cursor()
         h = self.__hashFormat(w1, w2)
         sql = f"select * from Words where W1=\"{h[0]}\" and W2=\"{h[1]}\";"
@@ -50,6 +54,7 @@ class Relation():
         
         cursor.close()
         self.conn.commit()
+        self.__close()
     
 
     def insert(self, w1: str, w2:str, r:float =0) -> None:
@@ -62,12 +67,14 @@ class Relation():
             r (float): 設定する関連度 (初期値=0)
         """
 
+        self.__connect()
         cursor = self.conn.cursor()
         h = self.__hashFormat(w1, w2)
         sql = f"insert into Words(W1, W2, R) values(\"{h[0]}\", \"{h[1]}\", {r});"
         cursor.execute(sql)
         cursor.close()
         self.conn.commit()
+        self.__close()
 
     
     def __hashFormat(self, w1:str, w2: str) -> tuple:
@@ -88,9 +95,28 @@ class Relation():
         """
         DBテーブルを作成する。
         """
+        self.__connect()
         cursor = self.conn.cursor()
         cursor.execute("create table Words(W1 nchar(64) , W2 nchar(64), R double, primary key(W1, W2));")
         self.conn.commit()
+        self.__close()
+
+
+    def __connect(self) -> None:
+        """
+        データベースに接続する。
+        """
+        if not os.path.exists(self.filename): self.createDatabase()
+        self.conn = sqlite3.connect(self.filename)
+
+
+    def __close(self):
+        """
+        データベースへの接続を解除する
+        """
+        self.conn.close()
+        self.conn = None
+        
 
 
 

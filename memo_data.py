@@ -1,5 +1,6 @@
 import joblib, os, uuid, spacy
 from type import Type
+from database import Relation
 
 class MemoData():
     """
@@ -7,6 +8,7 @@ class MemoData():
     """
     def __init__(self, filename) -> None:
         self.nlp = spacy.load('ja_ginza_electra') # 形態素解析
+        self.relation = Relation("test.db")
 
         if filename is not None:
             self.__filename = filename
@@ -97,6 +99,7 @@ class MemoData():
         if log: # not logged when undo/redo
             self.__do(Type.NEW, prevUUID, l)
         self.__data.append([prevUUID, l, r])
+        self.__wordsInSameSentence(r) # 代表単語の関連度を設定
         self.save()
         
 
@@ -286,3 +289,17 @@ class MemoData():
                     rep.append(token.orth_)
                 l.append(token.orth_)
         return l, rep
+
+    def __wordsInSameSentence(self, words: list) -> None:
+        """
+        同一文章内の単語の関連度を設定する
+
+        Args:
+            words (list): 代表単語の配列
+        """
+        
+        for i in range(0, len(words)-1):
+            for j in range(i+1, len(words)):
+                r = self.relation.getRelevance(words[i], words[j])
+                self.relation.update(words[i], words[j], r + 1)
+        
