@@ -1,5 +1,5 @@
 from tkinter import filedialog
-from flask import Flask, Response, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request
 from memo_data import MemoData
 from memo_config import MemoConfig
 from type import Type

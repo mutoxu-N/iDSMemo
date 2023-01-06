@@ -98,8 +98,10 @@ class MemoData():
 
         if log: # not logged when undo/redo
             self.__do(Type.NEW, prevUUID, l)
+            self.__wordsInSameSentence(r) # 代表単語の関連度を設定
+
         self.__data.append([prevUUID, l, r])
-        self.__wordsInSameSentence(r) # 代表単語の関連度を設定
+        self.__sort()
         self.save()
         
 
@@ -132,8 +134,11 @@ class MemoData():
         
         if log: # not logged when undo/redo
             self.__do(Type.EDIT, self.__data[idx][0], {"before": self.__data[idx][1], "after": l})
+            self.__wordsInSameSentence(r) # 代表単語の関連度を設定
+            
         self.__data[idx][1] = l
         self.__data[idx][2] = r
+        self.__sort()
 
 
     def group(self, l: list) -> None:
@@ -333,4 +338,21 @@ class MemoData():
                     if r:
                         sum += r
                         cnt += 1
-        return sum / cnt
+        if cnt == 0: return 0
+        else: return sum / cnt
+
+    
+    def __sort(self) -> None:
+        """
+        [private] メモの並び替えを行う
+        """
+        # TODO 階層クラスタリング
+        size = len(self.__data)
+        print(size)
+        relationMatrix = [[-1]*size for _ in [None]*size]
+        for i in range(size):
+            for j in range(i+1, size):
+                r = self.__sentenceRelation(i, j)
+                relationMatrix[i][j] = r
+                relationMatrix[j][i] = r
+
