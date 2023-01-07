@@ -154,7 +154,6 @@ class MemoData():
                 # i1 行目 と i2 行目
                 words1 = self.__data[l[i1]][2]
                 words2 = self.__data[l[i2]][2]
-                print(words1, words2)
                 for w1 in words1:
                     for w2 in words2:
                         if w1 != w2: # 違う単語のとき
@@ -338,9 +337,9 @@ class MemoData():
             for w2 in words2:
                 if w1 != w2: # 違う単語のとき
                     r = self.relation.getRelevance(w1, w2)
-                    if r:
-                        sum += r
-                        cnt += 1
+                    if r: sum += r
+                else: sum += 5
+                cnt += 1
         if cnt == 0: return 0
         else: return sum / cnt
 
