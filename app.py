@@ -81,7 +81,7 @@ def received():
         data.redo()
 
     elif js["type"] == Type.ALL_REMOVE:
-        data.removeAll()
+        data.removeAll()    
 
     elif js["type"] == Type.GROUP:
         data.group(js["group"])

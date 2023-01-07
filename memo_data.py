@@ -1,6 +1,7 @@
-import joblib, os, uuid, spacy
+import joblib, os, uuid, spacy, numpy as np
 from type import Type
 from database import Relation
+from scipy.cluster.hierarchy import linkage, dendrogram
 
 class MemoData():
     """
@@ -135,7 +136,7 @@ class MemoData():
         if log: # not logged when undo/redo
             self.__do(Type.EDIT, self.__data[idx][0], {"before": self.__data[idx][1], "after": l})
             self.__wordsInSameSentence(r) # 代表単語の関連度を設定
-            
+
         self.__data[idx][1] = l
         self.__data[idx][2] = r
         self.__sort()
@@ -153,12 +154,14 @@ class MemoData():
                 # i1 行目 と i2 行目
                 words1 = self.__data[l[i1]][2]
                 words2 = self.__data[l[i2]][2]
+                print(words1, words2)
                 for w1 in words1:
                     for w2 in words2:
                         if w1 != w2: # 違う単語のとき
                             r = self.relation.getRelevance(w1, w2)
                             if r:  self.relation.update(w1, w2, r + 5)
                             else:  self.relation.update(w1, w2, 5)
+        self.__sort()
 
 
     def removeAll(self, log=True) -> None:
@@ -346,13 +349,35 @@ class MemoData():
         """
         [private] メモの並び替えを行う
         """
-        # TODO 階層クラスタリング
         size = len(self.__data)
-        print(size)
-        relationMatrix = [[-1]*size for _ in [None]*size]
+
+        # 距離行列の作成
+        relationMatrix = np.array([[0]*size for _ in [None]*size])
         for i in range(size):
             for j in range(i+1, size):
                 r = self.__sentenceRelation(i, j)
-                relationMatrix[i][j] = r
-                relationMatrix[j][i] = r
+                relationMatrix[i][j] = -r
+                relationMatrix[j][i] = -r
+        
+        # 階層クラスタリング
+        linkageMatrix = linkage(relationMatrix, "ward")
 
+        # クラスタリングの結果からメモをソート
+        sortList = [[i] for i in range(size)]
+
+        for li in linkageMatrix:
+            tmp1 = sortList[int(li[0])]
+            tmp2 = sortList[int(li[1])]
+            if len(tmp1) < len(tmp2): sortList.append(tmp2 + tmp1)
+            else: sortList.append(tmp1 + tmp2)
+
+        tmp = []
+        for i in sortList[-1]:
+            tmp.append(self.__data[i])
+
+        self.__data = tmp
+        
+
+
+
+        
