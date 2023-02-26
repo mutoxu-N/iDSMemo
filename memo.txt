@@ -2,6 +2,7 @@
 ## Create
 python -m venv [name]
 
+python -m venv [name]
 
 ## Activate
 ./[name]/Scripts/activate
@@ -9,6 +10,7 @@ python -m venv [name]
 ## Diactivate
 deactivate
 
+python -m pip install --upgrade pip
 
 # pip
 ## make requirements.txt

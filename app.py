@@ -91,6 +91,10 @@ def received():
         
     return jsonify([data.filename, data.memo]), 200
 
+@app.route("/kill", methods=["POST"])
+def kill():
+    os._exit(0)
+
 
 if __name__ == "__main__":
     # flask 
